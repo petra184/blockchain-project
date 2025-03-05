@@ -1,0 +1,37 @@
+Block Simulation Results: 2025-03-05_15-16-50
+
+Input Configuration:
+ Block Time  Block Propagation Delay  No. Miners  Simulation Time
+        600                     0.42           3            10000
+
+Blocks Simulation Results:
+ Total Blocks  Main Blocks  Uncle blocks  Uncle Rate  Stale Blocks  Stale Rate  # transactions
+           14           14             0           0             0         0.0           25784
+
+Miner Profit Results:
+ Miner ID  % Hash Power  # Mined Blocks  % of main blocks  # Uncle Blocks  % of uncles  Profit (in ETH)
+        0            50               4             28.57               0            0        50.982978
+        0             0               0              0.00               0            0         0.000000
+        1            20               5             35.71               0            0        63.740907
+        0             0               0              0.00               0            0         0.000000
+        2            30               5             35.71               0            0        63.749572
+        0             0               0              0.00               0            0         0.000000
+
+Blockchain Chain Data:
+ Block Depth    Block ID  Previous Block  Block Timestamp  Miner ID  # transactions  Block Size
+           0           0              -1         0.000000       NaN               0         1.0
+           1 15046130824               0       535.293191       2.0            1908         1.0
+           2 52227149678     15046130824      1112.332293       2.0            1841         1.0
+           3 12471020929     52227149678      2481.948051       0.0            1790         1.0
+           4 36060666463     12471020929      4870.663335       1.0            1846         1.0
+           5 82421759944     36060666463      5151.378546       0.0            1858         1.0
+           6 71218984317     82421759944      5477.285931       1.0            1835         1.0
+           7 15656555444     71218984317      5637.968589       2.0            1828         1.0
+           8  1915410694     15656555444      6139.997838       1.0            1895         1.0
+           9 18776811468      1915410694      6144.418994       1.0            1813         1.0
+          10 33473632190     18776811468      6447.987098       1.0            1779         1.0
+          11 77176219160     33473632190      8182.161172       2.0            1840         1.0
+          12 69586257217     77176219160      9209.100484       0.0            1805         1.0
+          13 79461365636     69586257217      9230.709027       2.0            1879         1.0
+          14 48102337049     79461365636      9631.874375       0.0            1867         1.0
+

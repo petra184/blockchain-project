@@ -5,9 +5,9 @@ class InputsConfig:
     0 : The base model
     1 : Bitcoin model
     2 : Ethereum model
-        3 : AppendableBlock model
+    3 : AppendableBlock model
     """
-    model = 3
+    model = 1
 
     ''' Input configurations for the base model '''
     if model == 0:

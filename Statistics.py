@@ -2,6 +2,7 @@ from InputsConfig import InputsConfig as p
 from Models.Consensus import Consensus as c
 from Models.Incentives import Incentives
 import pandas as pd
+import os
 
 
 class Statistics:
@@ -20,11 +21,90 @@ class Statistics:
     index=0
     chain=[]
 
-    def calculate():
-        Statistics.global_chain() # print the global chain
-        Statistics.blocks_results() # calcuate and print block statistics e.g., # of accepted blocks and stale rate etc
-        Statistics.profit_results() # calculate and distribute the revenue or reward for miners
+    import os
+from datetime import datetime
+import pandas as pd
+from InputsConfig import InputsConfig as p
+from Models.Consensus import Consensus as c
+from Models.Incentives import Incentives
 
+class Statistics:
+    totalBlocks = 0
+    mainBlocks = 0
+    totalUncles = 0
+    uncleBlocks = 0
+    staleBlocks = 0
+    uncleRate = 0
+    staleRate = 0
+    blockData = []
+    blocksResults = []
+    profits = [[0 for x in range(7)] for y in range(p.Runs * len(p.NODES))]  # rows number of miners * number of runs, columns =7
+    index = 0
+    chain = []
+
+    @staticmethod
+    def calculate():
+        Statistics.global_chain()  # print the global chain
+        Statistics.blocks_results()  # calculate and print block statistics e.g., # of accepted blocks and stale rate etc
+        Statistics.profit_results()  # calculate and distribute the revenue or reward for miners
+        print("here")
+
+        # Check if the 'results' directory exists, if not create it
+        results_dir = 'results'
+        if not os.path.exists(results_dir):
+            os.makedirs(results_dir)
+
+        # Get current date and time for unique file name
+        current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        text_file_name = f"Run_{current_time}.txt"
+
+        # Absolute path of the results directory and the new file name
+        absolute_path = os.path.abspath(results_dir)
+        text_file_path = os.path.join(absolute_path, text_file_name)
+
+        # Print the results directory path
+        print(f"Results directory path: {absolute_path}")
+        print(f"Results will be saved as: {text_file_path}")
+
+        # Create the data as DataFrame (similar to what you had before)
+        df1 = pd.DataFrame({'Block Time': [p.Binterval], 'Block Propagation Delay': [p.Bdelay], 'No. Miners': [len(p.NODES)], 'Simulation Time': [p.simTime]})
+        df2 = pd.DataFrame(Statistics.blocksResults)
+        df2.columns = ['Total Blocks', 'Main Blocks', 'Uncle blocks', 'Uncle Rate', 'Stale Blocks', 'Stale Rate', '# transactions']
+        df3 = pd.DataFrame(Statistics.profits)
+        df3.columns = ['Miner ID', '% Hash Power', '# Mined Blocks', '% of main blocks', '# Uncle Blocks', '% of uncles', 'Profit (in ETH)']
+        df4 = pd.DataFrame(Statistics.chain)
+        if p.model == 2:
+            df4.columns = ['Block Depth', 'Block ID', 'Previous Block', 'Block Timestamp', 'Miner ID', '# transactions', 'Block Limit', 'Uncle Blocks']
+        else:
+            df4.columns = ['Block Depth', 'Block ID', 'Previous Block', 'Block Timestamp', 'Miner ID', '# transactions', 'Block Size']
+
+        # Write the data to a text file (instead of Excel)
+        with open(text_file_path, 'w') as file:
+            file.write(f"Block Simulation Results: {current_time}\n\n")
+
+            # Write DataFrame df1
+            file.write("Input Configuration:\n")
+            file.write(df1.to_string(index=False))
+            file.write("\n\n")
+
+            # Write DataFrame df2 (Blocks Results)
+            file.write("Blocks Simulation Results:\n")
+            file.write(df2.to_string(index=False))
+            file.write("\n\n")
+
+            # Write DataFrame df3 (Profit Results)
+            file.write("Miner Profit Results:\n")
+            file.write(df3.to_string(index=False))
+            file.write("\n\n")
+
+            # Write DataFrame df4 (Chain Data)
+            file.write("Blockchain Chain Data:\n")
+            file.write(df4.to_string(index=False))
+            file.write("\n\n")
+
+        print(f"Results saved to: {text_file_path}")
+      
+        
     ########################################################### Calculate block statistics Results ###########################################################################################
     def blocks_results():
         trans = 0
@@ -93,7 +173,7 @@ class Statistics:
         df3.to_excel(writer, sheet_name='Profit')
         df4.to_excel(writer,sheet_name='Chain')
 
-        writer.save()
+        writer.close()
 
     ########################################################### Reset all global variables used to calculate the simulation results ###########################################################################################
     def reset():
