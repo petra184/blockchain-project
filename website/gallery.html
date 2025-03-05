@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gallery - ArtCanvas</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <i class="fas fa-paint-brush"></i>
+            <span>ArtCanvas</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">Draw</a></li>
+            <li class="active"><a href="gallery.html">Gallery</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <div class="container">
+            <div class="gallery-header">
+                <h1>Artwork Gallery</h1>
+                <p>Browse and explore your creative collection</p>
+            </div>
+            
+            <div class="gallery-controls">
+                <div class="search-box">
+                    <input type="text" id="searchArtwork" placeholder="Search by name...">
+                    <i class="fas fa-search"></i>
+                </div>
+                <div class="sort-options">
+                    <label for="sortBy">Sort by:</label>
+                    <select id="sortBy">
+                        <option value="newest">Newest</option>
+                        <option value="oldest">Oldest</option>
+                        <option value="name">Name</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div id="gallery-container" class="gallery-grid">
+                <!-- Artwork will be displayed here -->
+                <div class="empty-gallery">
+                    <i class="fas fa-image"></i>
+                    <p>Your gallery is empty. Start creating some artwork!</p>
+                    <a href="index.html" class="primary-btn">Create Artwork</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="artwork-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div class="artwork-details">
+                <h2 id="modal-title">Artwork Title</h2>
+                <p id="modal-date">Created on: </p>
+                <div class="modal-image-container">
+                    <img id="modal-image" src="/placeholder.svg" alt="Artwork">
+                </div>
+                <div class="modal-actions">
+                    <button id="download-artwork" class="primary-btn">
+                        <i class="fas fa-download"></i> Download
+                    </button>
+                    <button id="delete-artwork" class="danger-btn">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="notification" class="notification">
+        <p id="notification-message"></p>
+    </div>
+
+    <script src="scripts.js"></script>
+</body>
+</html>
