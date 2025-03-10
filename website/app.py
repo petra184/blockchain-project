@@ -29,14 +29,14 @@ def submit_drawing():
     details = request.form['details']
     timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-    nft_metadata = {
+    art_metadata = {
         "name": name,
         "drawing_type": drawing_type,
         "details": details,
         "timestamp": timestamp
     }
 
-    transaction = Transaction(sender="User", receiver="Marketplace", data=nft_metadata)
+    transaction = Transaction(sender="User", receiver="Marketplace", data=art_metadata)
     blockchain.add_transaction(transaction)
 
 
@@ -46,20 +46,20 @@ def submit_drawing():
         file.write(f"Drawing Type: {drawing_type}\n")
         file.write(f"Details: {details}\n")
         file.write(f"Timestamp: {timestamp}\n")
-        file.write(f"NFT Hash: {transaction.tx_hash}\n")
+        file.write(f"Art Hash: {transaction.tx_hash}\n")
     
-    return jsonify({"message": f"Thank you, {name}. Your NFT has been minted!", "nft_hash": transaction.tx_hash})
+    return jsonify({"message": f"Thank you, {name}.", "art_hash": transaction.tx_hash})
 
-@app.route('/buy_nft', methods=['POST'])
-def buy_nft():
+@app.route('/buy_art', methods=['POST'])
+def buy_art():
     buyer = request.form['buyer']
-    nft_hash = request.form['nft_hash']
+    art_hash = request.form['art_hash']
 
     # Simulate transaction
-    purchase_transaction = Transaction(sender=buyer, receiver="Marketplace", data={"nft_hash": nft_hash, "action": "buy"})
+    purchase_transaction = Transaction(sender=buyer, receiver="Marketplace", data={"art_hash": art_hash, "action": "buy"})
     blockchain.add_transaction(purchase_transaction)
 
-    return jsonify({"message": f"{buyer} purchased NFT {nft_hash}!", "transaction_hash": purchase_transaction.tx_hash})
+    return jsonify({"message": f"{buyer} purchased {art_hash}!", "transaction_hash": purchase_transaction.tx_hash})
 
 if __name__ == '__main__':
     app.run(debug=True)
