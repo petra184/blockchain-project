@@ -7,16 +7,16 @@ import sys
 sys.path.append('/Users/Lorna/Desktop/crypto/website/BlockSim')
 
 # Import required modules from BlockSim
-from BlockSim import Block
-from BlockSim import Transaction
-from BlockSim import main  
+from BlockSim.Models import Block
+from BlockSim.Models import Transaction
+from BlockSim import Main  
 
 app = Flask(__name__)
 
-blockchain = main.Blockchain() if hasattr(main, 'Blockchain') else None
+blockCommit = Main.BlockCommit() if hasattr(Main, 'BlockCommit') else None
 
-if blockchain is None:
-    raise ImportError("Blockchain class not found in main.py. Ensure BlockSim has a Blockchain implementation.")
+if blockCommit is None:
+    raise ImportError("BlockCommit class not found in main.py. Ensure BlockSim has a blockCommit implementation.")
 
 @app.route('/')
 def home():
@@ -37,7 +37,7 @@ def submit_drawing():
     }
 
     transaction = Transaction(sender="User", receiver="Marketplace", data=art_metadata)
-    blockchain.add_transaction(transaction)
+    blockCommit.add_transaction(transaction)
 
 
     os.makedirs("requests", exist_ok=True)
@@ -57,10 +57,9 @@ def buy_art():
 
     # Simulate transaction
     purchase_transaction = Transaction(sender=buyer, receiver="Marketplace", data={"art_hash": art_hash, "action": "buy"})
-    blockchain.add_transaction(purchase_transaction)
+    blockCommit.add_transaction(purchase_transaction)
 
-    return jsonify({"message": f"{buyer} purchased {art_hash}!", "transaction_hash": purchase_transaction.tx_hash})
+    return jsonify({"message": f"{buyer} {art_hash}!", "transaction_hash": purchase_transaction.tx_hash})
 
 if __name__ == '__main__':
     app.run(debug=True)
-
