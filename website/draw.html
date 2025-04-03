@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ArtCanvas - Online Drawing Platform</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <i class="fas fa-paint-brush"></i>
+            <span>ArtCanvas</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">Marketplace</a></li>
+            <li class="active"><a href="draw.html">Draw</a></li>
+            <li><a href="gallery.html">Gallery</a></li>
+            
+        </ul>
+    </nav>
+
+    <main>
+        <div class="container">
+            <div class="drawing-header">
+                <h1>Create Your Art</h1>
+                <p>Express yourself through digital art and share your creations</p>
+            </div>
+            
+            <div class="drawing-board">
+                <div class="tools">
+                    <div class="tool-group">
+                        <label>Brush Size</label>
+                        <input type="range" id="brushSize" min="1" max="50" value="5">
+                    </div>
+                    
+                    <div class="tool-group">
+                        <label>Color</label>
+                        <input type="color" id="colorPicker" value="#6c63ff">
+                    </div>
+                    
+                    <div class="tool-group buttons">
+                        <button id="eraser" class="tool-btn"><i class="fas fa-eraser"></i> Eraser</button>
+                        <button id="clear" class="tool-btn"><i class="fas fa-trash"></i> Clear</button>
+                    </div>
+                </div>
+                
+                <div class="canvas-container">
+                    <canvas id="drawCanvas"></canvas>
+                </div>
+                
+                <div class="action-buttons">
+                    <div class="artwork-details">
+                        <div class="input-group">
+                            <label for="drawingName">Artwork Title</label>
+                            <input type="text" id="drawingName" placeholder="Name your artwork">
+                        </div>
+                        <div class="input-group">
+                            <label for="drawingCategory">Category</label>
+                            <select id="drawingCategory">
+                                <option value="abstract">Abstract</option>
+                                <option value="landscape">Landscape</option>
+                                <option value="portrait">Portrait</option>
+                                <option value="still-life">Still Life</option>
+                                <option value="digital-art">Digital Art</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label for="drawingPrice">Price ($)</label>
+                            <input type="number" id="drawingPrice" min="0" step="0.01" placeholder="Set a price">
+                        </div>
+                    </div>
+                    <button id="saveDrawing" class="btn primary-btn">
+                        <i class="fas fa-save"></i> Save Artwork
+                    </button>
+                </div>
+            </div>
+            
+            <div class="cta-section" style="margin-top: 3rem; text-align: center;">
+                <h2>Want to sell your artwork?</h2>
+                <p>Visit our marketplace to list your creations for sale</p>
+                <a href="index.html" class="btn primary-btn" style="margin-top: 1rem;">
+                    <i class="fas fa-store"></i> Go to Marketplace
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <div id="notification" class="notification">
+        <p id="notification-message"></p>
+    </div>
+
+    <script src="scripts.js"></script>
+</body>
+</html>
+

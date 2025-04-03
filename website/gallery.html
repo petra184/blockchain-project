@@ -6,6 +6,7 @@
     <title>Gallery - ArtCanvas</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <nav class="navbar">
@@ -14,7 +15,8 @@
             <span>ArtCanvas</span>
         </div>
         <ul class="nav-links">
-            <li><a href="index.html">Draw</a></li>
+            <li><a href="index.html">Marketplace</a></li>
+            <li><a href="draw.html">Draw</a></li>
             <li class="active"><a href="gallery.html">Gallery</a></li>
         </ul>
     </nav>
@@ -22,7 +24,7 @@
     <main>
         <div class="container">
             <div class="gallery-header">
-                <h1>Artwork Gallery</h1>
+                <h1>Your Artwork Gallery</h1>
                 <p>Browse and explore your creative collection</p>
             </div>
             
@@ -37,6 +39,8 @@
                         <option value="newest">Newest</option>
                         <option value="oldest">Oldest</option>
                         <option value="name">Name</option>
+                        <option value="price-low">Price: Low to High</option>
+                        <option value="price-high">Price: High to Low</option>
                     </select>
                 </div>
             </div>
@@ -49,6 +53,14 @@
                     <a href="index.html" class="primary-btn">Create Artwork</a>
                 </div>
             </div>
+            
+            <div class="cta-section" style="margin-top: 3rem; text-align: center;">
+                <h2>Ready to share your art with the world?</h2>
+                <p>List your artwork on our marketplace and start selling today</p>
+                <a href="index.html" class="btn primary-btn" style="margin-top: 1rem;">
+                    <i class="fas fa-store"></i> Go to Marketplace
+                </a>
+            </div>
         </div>
     </main>
 
@@ -58,14 +70,19 @@
             <div class="artwork-details">
                 <h2 id="modal-title">Artwork Title</h2>
                 <p id="modal-date">Created on: </p>
+                <p id="modal-category">Category: </p>
+                <p id="modal-price">Price: </p>
                 <div class="modal-image-container">
-                    <img id="modal-image" src="/placeholder.svg" alt="Artwork">
+                    <img id="modal-image" src="/placeholder.svg?height=400&width=600" alt="Artwork">
                 </div>
                 <div class="modal-actions">
-                    <button id="download-artwork" class="primary-btn">
+                    <button id="download-artwork" class="btn primary-btn">
                         <i class="fas fa-download"></i> Download
                     </button>
-                    <button id="delete-artwork" class="danger-btn">
+                    <button id="sell-artwork" class="btn secondary-btn">
+                        <i class="fas fa-tag"></i> Sell on Marketplace
+                    </button>
+                    <button id="delete-artwork" class="btn danger-btn">
                         <i class="fas fa-trash"></i> Delete
                     </button>
                 </div>
@@ -80,3 +97,4 @@
     <script src="scripts.js"></script>
 </body>
 </html>
+
