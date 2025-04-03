@@ -1,398 +1,681 @@
-// Canvas setup and drawing functionality
 document.addEventListener("DOMContentLoaded", () => {
-    // Get the current page
-    const currentPage = window.location.pathname.split("/").pop()
-  
-    // Initialize canvas if on drawing page
-    if (currentPage === "index.html" || currentPage === "") {
-      initializeCanvas()
-    }
-  
-    // Initialize gallery if on gallery page
-    if (currentPage === "gallery.html") {
-      loadGallery()
-      setupGalleryControls()
-    }
-  
-    // Setup notification system
-    setupNotifications()
-  })
-  
-  // Canvas variables
-  let canvas, ctx
-  let isDrawing = false
-  let lastX = 0
-  let lastY = 0
-  let brushSize = 5
-  let currentColor = "#4361ee"
-  let isEraser = false
-  
-  function initializeCanvas() {
-    // Get canvas and context
-    canvas = document.getElementById("drawCanvas")
-    ctx = canvas.getContext("2d")
-  
+  // Common elements
+  const notification = document.getElementById("notification")
+  const notificationMessage = document.getElementById("notification-message")
+
+  // Show notification
+  function showNotification(message, type = "success") {
+    notificationMessage.textContent = message
+    notification.className = "notification show " + type
+
+    setTimeout(() => {
+      notification.className = "notification"
+    }, 3000)
+  }
+
+  // Drawing page functionality
+  if (document.getElementById("drawCanvas")) {
+    const canvas = document.getElementById("drawCanvas")
+    const ctx = canvas.getContext("2d")
+    const brushSizeInput = document.getElementById("brushSize")
+    const colorPicker = document.getElementById("colorPicker")
+    const eraserBtn = document.getElementById("eraser")
+    const clearBtn = document.getElementById("clear")
+    const saveBtn = document.getElementById("saveDrawing")
+    const drawingNameInput = document.getElementById("drawingName")
+    const drawingCategoryInput = document.getElementById("drawingCategory")
+    const drawingPriceInput = document.getElementById("drawingPrice")
+
+    let isDrawing = false
+    let lastX = 0
+    let lastY = 0
+    let isEraser = false
+    let originalColor = colorPicker.value
+
     // Set canvas size
+    function resizeCanvas() {
+      const container = canvas.parentElement
+      canvas.width = container.clientWidth > 800 ? 800 : container.clientWidth - 20
+      canvas.height = 500
+
+      // Fill with white background
+      ctx.fillStyle = "white"
+      ctx.fillRect(0, 0, canvas.width, canvas.height)
+    }
+
     resizeCanvas()
-  
+    window.addEventListener("resize", resizeCanvas)
+
+    // Drawing functions
+    function startDrawing(e) {
+      isDrawing = true
+      ;[lastX, lastY] = getCoordinates(e)
+    }
+
+    function draw(e) {
+      if (!isDrawing) return
+
+      const [currentX, currentY] = getCoordinates(e)
+
+      ctx.lineJoin = "round"
+      ctx.lineCap = "round"
+      ctx.lineWidth = brushSizeInput.value
+      ctx.strokeStyle = isEraser ? "white" : colorPicker.value
+
+      ctx.beginPath()
+      ctx.moveTo(lastX, lastY)
+      ctx.lineTo(currentX, currentY)
+      ctx.stroke()
+      ;[lastX, lastY] = [currentX, currentY]
+    }
+
+    function stopDrawing() {
+      isDrawing = false
+    }
+
+    function getCoordinates(e) {
+      const rect = canvas.getBoundingClientRect()
+      const x = e.type.includes("touch") ? e.touches[0].clientX - rect.left : e.clientX - rect.left
+      const y = e.type.includes("touch") ? e.touches[0].clientY - rect.top : e.clientY - rect.top
+      return [x, y]
+    }
+
     // Event listeners for drawing
     canvas.addEventListener("mousedown", startDrawing)
     canvas.addEventListener("mousemove", draw)
     canvas.addEventListener("mouseup", stopDrawing)
     canvas.addEventListener("mouseout", stopDrawing)
-  
+
     // Touch support
-    canvas.addEventListener("touchstart", handleTouchStart)
-    canvas.addEventListener("touchmove", handleTouchMove)
+    canvas.addEventListener("touchstart", startDrawing)
+    canvas.addEventListener("touchmove", draw)
     canvas.addEventListener("touchend", stopDrawing)
-  
-    // Tool controls
-    document.getElementById("brushSize").addEventListener("input", updateBrushSize)
-    document.getElementById("colorPicker").addEventListener("input", updateColor)
-    document.getElementById("eraser").addEventListener("click", toggleEraser)
-    document.getElementById("clear").addEventListener("click", clearCanvas)
-    document.getElementById("saveDrawing").addEventListener("click", saveDrawing)
-  
-    // Handle window resize
-    window.addEventListener("resize", resizeCanvas)
-  
-    // Initial brush size
-    updateBrushSize()
-  }
-  
-  function resizeCanvas() {
-    const container = document.querySelector(".canvas-container")
-    const containerWidth = container.clientWidth
-  
-    // Set canvas dimensions
-    canvas.width = Math.min(containerWidth - 30, 800)
-    canvas.height = 500
-  
-    // Set white background
-    ctx.fillStyle = "#ffffff"
-    ctx.fillRect(0, 0, canvas.width, canvas.height)
-  }
-  
-  function startDrawing(e) {
-    isDrawing = true
-    const coords = getCoordinates(e)
-    lastX = coords.x
-    lastY = coords.y
-  
-    // Draw a single dot if just clicked
-    ctx.beginPath()
-    ctx.arc(lastX, lastY, brushSize / 2, 0, Math.PI * 2)
-    ctx.fillStyle = isEraser ? "#ffffff" : currentColor
-    ctx.fill()
-  }
-  
-  function draw(e) {
-    if (!isDrawing) return
-  
-    const coords = getCoordinates(e)
-    const x = coords.x
-    const y = coords.y
-  
-    // Start drawing
-    ctx.beginPath()
-    ctx.moveTo(lastX, lastY)
-    ctx.lineTo(x, y)
-    ctx.strokeStyle = isEraser ? "#ffffff" : currentColor
-    ctx.lineWidth = brushSize
-    ctx.lineCap = "round"
-    ctx.lineJoin = "round"
-    ctx.stroke()
-  
-    // Update last position
-    lastX = x
-    lastY = y
-  }
-  
-  function stopDrawing() {
-    isDrawing = false
-  }
-  
-  function getCoordinates(e) {
-    let x, y
-  
-    if (e.type.includes("touch")) {
-      const rect = canvas.getBoundingClientRect()
-      x = e.touches[0].clientX - rect.left
-      y = e.touches[0].clientY - rect.top
-    } else {
-      x = e.offsetX
-      y = e.offsetY
-    }
-  
-    return { x, y }
-  }
-  
-  function handleTouchStart(e) {
-    e.preventDefault()
-    startDrawing(e)
-  }
-  
-  function handleTouchMove(e) {
-    e.preventDefault()
-    draw(e)
-  }
-  
-  function updateBrushSize() {
-    brushSize = document.getElementById("brushSize").value
-  }
-  
-  function updateColor() {
-    currentColor = document.getElementById("colorPicker").value
-    isEraser = false
-    document.getElementById("eraser").classList.remove("active")
-  }
-  
-  function toggleEraser() {
-    isEraser = !isEraser
-    document.getElementById("eraser").classList.toggle("active")
-  }
-  
-  function clearCanvas() {
-    ctx.fillStyle = "#ffffff"
-    ctx.fillRect(0, 0, canvas.width, canvas.height)
-  }
-  
-  function saveDrawing() {
-    const drawingName = document.getElementById("drawingName").value || "Untitled Artwork"
-  
-    // Get canvas data
-    const imageData = canvas.toDataURL("image/png")
-  
-    // Create artwork object
-    const artwork = {
-      id: Date.now().toString(),
-      name: drawingName,
-      date: new Date().toISOString(),
-      image: imageData,
-    }
-  
-    // Get existing artwork from localStorage
-    const savedArtwork = JSON.parse(localStorage.getItem("artwork")) || []
-  
-    // Add new artwork
-    savedArtwork.push(artwork)
-  
-    // Save to localStorage
-    localStorage.setItem("artwork", JSON.stringify(savedArtwork))
-  
-    // Show notification
-    showNotification("Artwork saved successfully!")
-  
-    // Clear input
-    document.getElementById("drawingName").value = ""
-  }
-  
-  // Gallery functionality
-  function loadGallery() {
-    const galleryContainer = document.getElementById("gallery-container")
-    const savedArtwork = JSON.parse(localStorage.getItem("artwork")) || []
-  
-    // Clear gallery container
-    galleryContainer.innerHTML = ""
-  
-    if (savedArtwork.length === 0) {
-      // Show empty state
-      galleryContainer.innerHTML = `
-              <div class="empty-gallery">
-                  <i class="fas fa-image"></i>
-                  <p>Your gallery is empty. Start creating some artwork!</p>
-                  <a href="index.html" class="primary-btn">Create Artwork</a>
-              </div>
-          `
-      return
-    }
-  
-    // Display each artwork
-    savedArtwork.forEach((artwork) => {
-      const galleryItem = document.createElement("div")
-      galleryItem.className = "gallery-item"
-      galleryItem.dataset.id = artwork.id
-  
-      const date = new Date(artwork.date)
-      const formattedDate = date.toLocaleDateString()
-  
-      galleryItem.innerHTML = `
-              <img src="${artwork.image}" alt="${artwork.name}" class="gallery-item-image">
-              <div class="gallery-item-info">
-                  <h3 class="gallery-item-title">${artwork.name}</h3>
-                  <p class="gallery-item-date">${formattedDate}</p>
-              </div>
-          `
-  
-      galleryItem.addEventListener("click", () => openArtworkModal(artwork))
-  
-      galleryContainer.appendChild(galleryItem)
-    })
-  }
-  
-  function setupGalleryControls() {
-    // Search functionality
-    const searchInput = document.getElementById("searchArtwork")
-    if (searchInput) {
-      searchInput.addEventListener("input", filterGallery)
-    }
-  
-    // Sort functionality
-    const sortSelect = document.getElementById("sortBy")
-    if (sortSelect) {
-      sortSelect.addEventListener("change", sortGallery)
-    }
-  
-    // Modal close button
-    const closeModal = document.querySelector(".close-modal")
-    if (closeModal) {
-      closeModal.addEventListener("click", closeArtworkModal)
-    }
-  
-    // Download button in modal
-    const downloadBtn = document.getElementById("download-artwork")
-    if (downloadBtn) {
-      downloadBtn.addEventListener("click", downloadArtwork)
-    }
-  
-    // Delete button in modal
-    const deleteBtn = document.getElementById("delete-artwork")
-    if (deleteBtn) {
-      deleteBtn.addEventListener("click", deleteArtwork)
-    }
-  }
-  
-  function filterGallery() {
-    const searchTerm = document.getElementById("searchArtwork").value.toLowerCase()
-    const galleryItems = document.querySelectorAll(".gallery-item")
-  
-    galleryItems.forEach((item) => {
-      const title = item.querySelector(".gallery-item-title").textContent.toLowerCase()
-      if (title.includes(searchTerm)) {
-        item.style.display = "block"
+
+    // Tool buttons
+    eraserBtn.addEventListener("click", () => {
+      if (!isEraser) {
+        originalColor = colorPicker.value
+        isEraser = true
+        eraserBtn.classList.add("active")
       } else {
-        item.style.display = "none"
+        isEraser = false
+        colorPicker.value = originalColor
+        eraserBtn.classList.remove("active")
       }
     })
+
+    clearBtn.addEventListener("click", () => {
+      ctx.fillStyle = "white"
+      ctx.fillRect(0, 0, canvas.width, canvas.height)
+    })
+
+    // Color picker
+    colorPicker.addEventListener("change", () => {
+      if (isEraser) {
+        isEraser = false
+        eraserBtn.classList.remove("active")
+      }
+    })
+
+    // Save drawing
+    saveBtn.addEventListener("click", () => {
+      const drawingName = drawingNameInput.value.trim() || "Untitled Artwork"
+      const category = drawingCategoryInput.value
+      const price = Number.parseFloat(drawingPriceInput.value) || 0
+      const forSale = price > 0
+
+      // Convert canvas to data URL
+      const dataURL = canvas.toDataURL("image/png")
+
+      // Create artwork object
+      const artwork = {
+        id: Date.now().toString(),
+        name: drawingName,
+        category: category,
+        dataURL: dataURL,
+        date: new Date().toISOString(),
+        forSale: forSale,
+        price: price,
+      }
+
+      // Get existing artworks from localStorage
+      const artworks = JSON.parse(localStorage.getItem("artworks") || "[]")
+
+      // Add new artwork
+      artworks.push(artwork)
+
+      // Save to localStorage
+      localStorage.setItem("artworks", JSON.stringify(artworks))
+
+      // Show notification
+      showNotification(`"${drawingName}" saved successfully!`)
+
+      // Reset drawing name and price
+      drawingNameInput.value = ""
+      drawingPriceInput.value = ""
+    })
   }
-  
-  function sortGallery() {
-    const sortBy = document.getElementById("sortBy").value
+
+  // Gallery page functionality
+  if (document.getElementById("gallery-container")) {
     const galleryContainer = document.getElementById("gallery-container")
-    const savedArtwork = JSON.parse(localStorage.getItem("artwork")) || []
-  
-    // Sort artwork
-    const sortedArtwork = [...savedArtwork]
-  
-    switch (sortBy) {
-      case "newest":
-        sortedArtwork.sort((a, b) => new Date(b.date) - new Date(a.date))
-        break
-      case "oldest":
-        sortedArtwork.sort((a, b) => new Date(a.date) - new Date(b.date))
-        break
-      case "name":
-        sortedArtwork.sort((a, b) => a.name.localeCompare(b.name))
-        break
-    }
-  
-    // Update localStorage
-    localStorage.setItem("artwork", JSON.stringify(sortedArtwork))
-  
-    // Reload gallery
-    loadGallery()
-  }
-  
-  function openArtworkModal(artwork) {
+    const searchInput = document.getElementById("searchArtwork")
+    const sortSelect = document.getElementById("sortBy")
     const modal = document.getElementById("artwork-modal")
     const modalTitle = document.getElementById("modal-title")
     const modalDate = document.getElementById("modal-date")
+    const modalCategory = document.getElementById("modal-category")
+    const modalPrice = document.getElementById("modal-price")
     const modalImage = document.getElementById("modal-image")
-  
-    // Set modal content
-    modalTitle.textContent = artwork.name
-  
-    const date = new Date(artwork.date)
-    modalDate.textContent = `Created on: ${date.toLocaleDateString()}`
-  
-    modalImage.src = artwork.image
-    modalImage.alt = artwork.name
-  
-    // Store artwork ID in modal
-    modal.dataset.artworkId = artwork.id
-  
-    // Show modal
-    modal.style.display = "block"
-  
-    // Close modal when clicking outside
+    const downloadBtn = document.getElementById("download-artwork")
+    const deleteBtn = document.getElementById("delete-artwork")
+    const sellBtn = document.getElementById("sell-artwork")
+    const closeModal = document.querySelector(".close-modal")
+
+    let currentArtworkId = null
+    let artworks = []
+
+    // Load artworks from localStorage
+    function loadArtworks() {
+      artworks = JSON.parse(localStorage.getItem("artworks") || "[]")
+      displayArtworks(artworks)
+    }
+
+    // Display artworks in gallery
+    function displayArtworks(artworksToDisplay) {
+      if (artworksToDisplay.length === 0) {
+        // Check if this is initial load or search result
+        if (searchInput.value.trim() !== "") {
+          galleryContainer.innerHTML = "No artwork found"
+        } else {
+          galleryContainer.innerHTML = "Your gallery is empty. Start creating some artwork!"
+        }
+        return
+      }
+
+      galleryContainer.innerHTML = ""
+
+      artworksToDisplay.forEach((artwork) => {
+        const artworkCard = document.createElement("div")
+        artworkCard.className = "artwork-card"
+        artworkCard.dataset.id = artwork.id
+
+        const formattedDate = new Date(artwork.date).toLocaleDateString()
+        const categoryDisplay = artwork.category
+          ? artwork.category.charAt(0).toUpperCase() + artwork.category.slice(1)
+          : "Uncategorized"
+        const priceDisplay = artwork.price > 0 ? `$${artwork.price.toFixed(2)}` : "Not for sale"
+
+        artworkCard.innerHTML = `
+          <img src="${artwork.dataURL}" alt="${artwork.name}" class="artwork-image">
+          <div class="artwork-info">
+            <h3>${artwork.name}</h3>
+            <p>${formattedDate}</p>
+            <p>Category: ${categoryDisplay}</p>
+            <p>Price: ${priceDisplay}</p>
+          </div>
+        `
+
+        artworkCard.addEventListener("click", () => openArtworkModal(artwork))
+
+        galleryContainer.appendChild(artworkCard)
+      })
+    }
+
+    // Open artwork modal
+    function openArtworkModal(artwork) {
+      currentArtworkId = artwork.id
+      modalTitle.textContent = artwork.name
+      modalDate.textContent = `Created on: ${new Date(artwork.date).toLocaleDateString()}`
+
+      // Display category
+      const categoryDisplay = artwork.category
+        ? artwork.category.charAt(0).toUpperCase() + artwork.category.slice(1)
+        : "Uncategorized"
+      modalCategory.textContent = `Category: ${categoryDisplay}`
+
+      // Display price
+      const priceDisplay = artwork.price > 0 ? `$${artwork.price.toFixed(2)}` : "Not for sale"
+      modalPrice.textContent = `Price: ${priceDisplay}`
+
+      modalImage.src = artwork.dataURL
+
+      if (artwork.forSale) {
+        sellBtn.textContent = `Listed for $${artwork.price.toFixed(2)}`
+        sellBtn.disabled = true
+      } else {
+        sellBtn.textContent = "Sell on Marketplace"
+        sellBtn.disabled = false
+      }
+
+      modal.style.display = "block"
+    }
+
+    // Close modal
+    closeModal.addEventListener("click", () => {
+      modal.style.display = "none"
+    })
+
     window.addEventListener("click", (e) => {
       if (e.target === modal) {
-        closeArtworkModal()
+        modal.style.display = "none"
       }
     })
+
+    // Download artwork
+    downloadBtn.addEventListener("click", () => {
+      const artwork = artworks.find((a) => a.id === currentArtworkId)
+      if (!artwork) return
+
+      const link = document.createElement("a")
+      link.download = `${artwork.name}.png`
+      link.href = artwork.dataURL
+      link.click()
+    })
+
+    // Delete artwork
+    deleteBtn.addEventListener("click", () => {
+      if (!currentArtworkId) return
+
+      const updatedArtworks = artworks.filter((a) => a.id !== currentArtworkId)
+      localStorage.setItem("artworks", JSON.stringify(updatedArtworks))
+
+      showNotification("Artwork deleted successfully")
+      modal.style.display = "none"
+
+      loadArtworks()
+    })
+
+    // Sell artwork
+    if (sellBtn) {
+      sellBtn.addEventListener("click", () => {
+        if (!currentArtworkId) return
+
+        const pricePrompt = prompt("Enter the price for your artwork ($):", "50")
+        if (pricePrompt === null) return
+
+        const price = Number.parseFloat(pricePrompt)
+        if (isNaN(price) || price <= 0) {
+          showNotification("Please enter a valid price", "error")
+          return
+        }
+
+        // Update artwork with price and forSale flag
+        const updatedArtworks = artworks.map((a) => {
+          if (a.id === currentArtworkId) {
+            return { ...a, forSale: true, price }
+          }
+          return a
+        })
+
+        localStorage.setItem("artworks", JSON.stringify(updatedArtworks))
+
+        showNotification("Artwork listed for sale successfully")
+        modal.style.display = "none"
+
+        loadArtworks()
+      })
+    }
+
+    // Search functionality
+    searchInput.addEventListener("input", () => {
+      const searchTerm = searchInput.value.toLowerCase()
+
+      // Create a placeholder for "no results" that maintains layout
+      const emptyGalleryHTML = searchTerm
+        ? `<div class="empty-gallery">
+          <i class="fas fa-search"></i>
+          <p>No artwork found</p>
+        </div>`
+        : `<div class="empty-gallery">
+          <i class="fas fa-image"></i>
+          <p>Your gallery is empty. Start creating some artwork!</p>
+          <a href="draw.html" class="primary-btn">Create Artwork</a>
+        </div>`
+
+      // Filter the artworks by name only
+      const filteredArtworks = artworks.filter((artwork) => artwork.name.toLowerCase().includes(searchTerm))
+
+      // If no results, show placeholder with consistent height
+      if (filteredArtworks.length === 0) {
+        galleryContainer.innerHTML = emptyGalleryHTML
+        return
+      }
+
+      // Display the filtered artworks
+      displayArtworks(filteredArtworks)
+    })
+
+    // Sort functionality
+    sortSelect.addEventListener("change", () => {
+      const sortValue = sortSelect.value
+      const sortedArtworks = [...artworks]
+
+      switch (sortValue) {
+        case "newest":
+          sortedArtworks.sort((a, b) => new Date(b.date) - new Date(a.date))
+          break
+        case "oldest":
+          sortedArtworks.sort((a, b) => new Date(a.date) - new Date(b.date))
+          break
+        case "name":
+          sortedArtworks.sort((a, b) => a.name.localeCompare(b.name))
+          break
+        case "price-low":
+          sortedArtworks.sort((a, b) => a.price - b.price)
+          break
+        case "price-high":
+          sortedArtworks.sort((a, b) => b.price - a.price)
+          break
+      }
+
+      displayArtworks(sortedArtworks)
+    })
+
+    // Load artworks on page load
+    loadArtworks()
   }
-  
-  function closeArtworkModal() {
-    const modal = document.getElementById("artwork-modal")
-    modal.style.display = "none"
+
+  // Marketplace page functionality
+  if (document.getElementById("marketplace-grid")) {
+    const marketplaceGrid = document.getElementById("marketplace-grid")
+    const searchInput = document.getElementById("searchMarketplace")
+    const categoryFilter = document.getElementById("categoryFilter")
+    const priceFilter = document.getElementById("priceFilter")
+    const sortFilter = document.getElementById("sortFilter")
+
+    // Create marketplace modal elements if they don't exist
+    let marketplaceModal = document.getElementById("marketplace-modal")
+    if (!marketplaceModal) {
+      marketplaceModal = document.createElement("div")
+      marketplaceModal.id = "marketplace-modal"
+      marketplaceModal.className = "modal"
+
+      marketplaceModal.innerHTML = `
+        <div class="modal-content">
+          <span class="close-modal">&times;</span>
+          <div class="artwork-details">
+            <h2 id="marketplace-modal-title">Artwork Title</h2>
+            <p id="marketplace-modal-category">Category: </p>
+            <p id="marketplace-modal-price">Price: </p>
+            <div class="modal-image-container">
+              <img id="marketplace-modal-image" src="/placeholder.svg?height=400&width=600" alt="Artwork">
+            </div>
+            <div class="modal-actions">
+              <button id="buy-artwork" class="btn primary-btn">
+                <i class="fas fa-shopping-cart"></i> Buy Now
+              </button>
+            </div>
+          </div>
+        </div>
+      `
+
+      document.body.appendChild(marketplaceModal)
+    }
+
+    const marketplaceModalTitle = document.getElementById("marketplace-modal-title")
+    const marketplaceModalCategory = document.getElementById("marketplace-modal-category")
+    const marketplaceModalPrice = document.getElementById("marketplace-modal-price")
+    const marketplaceModalImage = document.getElementById("marketplace-modal-image")
+    const buyBtn = document.getElementById("buy-artwork")
+    const closeMarketplaceModal = marketplaceModal.querySelector(".close-modal")
+
+    let currentMarketplaceItemId = null
+    let marketplaceItems = []
+
+    // Load artworks from localStorage
+    function loadMarketplaceItems() {
+      const artworks = JSON.parse(localStorage.getItem("artworks") || "[]")
+      marketplaceItems = artworks.filter((artwork) => artwork.forSale)
+
+      if (marketplaceItems.length === 0) {
+        // If no user artworks are for sale, keep the sample items
+        return
+      }
+
+      // Clear sample items
+      marketplaceGrid.innerHTML = ""
+
+      // Display user's for-sale artworks
+      displayMarketplaceItems(marketplaceItems)
+    }
+
+    // Display marketplace items
+    function displayMarketplaceItems(itemsToDisplay) {
+      if (itemsToDisplay.length === 0) {
+        marketplaceGrid.innerHTML = "No artwork found"
+        return
+      }
+
+      marketplaceGrid.innerHTML = ""
+
+      itemsToDisplay.forEach((artwork) => {
+        const productCard = document.createElement("div")
+        productCard.className = "product-card"
+        productCard.dataset.id = artwork.id
+
+        const formattedDate = new Date(artwork.date).toLocaleDateString()
+        const categoryDisplay = artwork.category
+          ? artwork.category.charAt(0).toUpperCase() + artwork.category.slice(1)
+          : "Uncategorized"
+
+        productCard.innerHTML = `
+          <img src="${artwork.dataURL}" alt="${artwork.name}" class="product-image">
+          <div class="product-info">
+            <h3>${artwork.name}</h3>
+            <p>Category: ${categoryDisplay}</p>
+            <div class="artist-info">
+              <span class="artist-name">by You</span>
+            </div>
+            <div class="price">$${artwork.price.toFixed(2)}</div>
+            <div class="product-actions">
+              <button class="btn primary-btn"><i class="fas fa-shopping-cart"></i> Buy Now</button>
+            </div>
+          </div>
+        `
+
+        // Add click event to the product card
+        productCard.addEventListener("click", (e) => {
+          // Don't open modal if Buy Now button was clicked
+          if (e.target.closest(".primary-btn")) {
+            return
+          }
+          openMarketplaceModal(artwork)
+        })
+
+        marketplaceGrid.appendChild(productCard)
+      })
+    }
+
+    // Open marketplace modal
+    function openMarketplaceModal(artwork) {
+      currentMarketplaceItemId = artwork.id
+      marketplaceModalTitle.textContent = artwork.name
+
+      // Display category
+      const categoryDisplay = artwork.category
+        ? artwork.category.charAt(0).toUpperCase() + artwork.category.slice(1)
+        : "Uncategorized"
+      marketplaceModalCategory.textContent = `Category: ${categoryDisplay}`
+
+      // Display price
+      marketplaceModalPrice.textContent = `Price: $${artwork.price.toFixed(2)}`
+
+      // Set image
+      marketplaceModalImage.src = artwork.dataURL
+
+      // Show modal
+      marketplaceModal.style.display = "block"
+    }
+
+    // Close marketplace modal
+    closeMarketplaceModal.addEventListener("click", () => {
+      marketplaceModal.style.display = "none"
+    })
+
+    window.addEventListener("click", (e) => {
+      if (e.target === marketplaceModal) {
+        marketplaceModal.style.display = "none"
+      }
+    })
+
+    // Buy artwork button in modal
+    buyBtn.addEventListener("click", () => {
+      showNotification("Purchase functionality will be implemented with your Python backend")
+      marketplaceModal.style.display = "none"
+    })
+
+    // Search functionality - using direct filtering for all criteria
+    if (searchInput) {
+      searchInput.addEventListener("input", () => {
+        const searchTerm = searchInput.value.toLowerCase()
+
+        // Filter the marketplace items
+        let filteredItems = marketplaceItems
+
+        // Apply search filter
+        if (searchTerm) {
+          filteredItems = filteredItems.filter((item) => item.name.toLowerCase().includes(searchTerm))
+        }
+
+        // Apply category filter
+        if (categoryFilter && categoryFilter.value !== "all") {
+          filteredItems = filteredItems.filter((item) => item.category === categoryFilter.value)
+        }
+
+        // Apply price filter
+        if (priceFilter && priceFilter.value !== "all") {
+          filteredItems = filteredItems.filter((item) => {
+            const priceValue = item.price
+            switch (priceFilter.value) {
+              case "under-50":
+                return priceValue < 50
+              case "50-100":
+                return priceValue >= 50 && priceValue <= 100
+              case "100-200":
+                return priceValue > 100 && priceValue <= 200
+              case "over-200":
+                return priceValue > 200
+              default:
+                return true
+            }
+          })
+        }
+
+        // Apply sorting
+        if (sortFilter && sortFilter.value !== "newest") {
+          switch (sortFilter.value) {
+            case "price-low":
+              filteredItems.sort((a, b) => a.price - b.price)
+              break
+            case "price-high":
+              filteredItems.sort((a, b) => b.price - a.price)
+              break
+            case "popular":
+              // This would normally use a popularity metric
+              // For now, just randomize
+              filteredItems.sort(() => Math.random() - 0.5)
+              break
+          }
+        }
+
+        // Display the filtered items
+        displayMarketplaceItems(filteredItems)
+      })
+    }
+
+    // Event listeners for filters
+    if (categoryFilter) {
+      categoryFilter.addEventListener("change", () => {
+        // Trigger the search input's event handler
+        searchInput.dispatchEvent(new Event("input"))
+      })
+    }
+
+    if (priceFilter) {
+      priceFilter.addEventListener("change", () => {
+        // Trigger the search input's event handler
+        searchInput.dispatchEvent(new Event("input"))
+      })
+    }
+
+    if (sortFilter) {
+      sortFilter.addEventListener("change", () => {
+        // Trigger the search input's event handler
+        searchInput.dispatchEvent(new Event("input"))
+      })
+    }
+
+    // Buy now button functionality
+    marketplaceGrid.addEventListener("click", (e) => {
+      if (e.target.closest(".primary-btn") && e.target.textContent.includes("Buy Now")) {
+        showNotification("Purchase functionality will be implemented with your Python backend")
+      }
+    })
+
+    // Load marketplace items
+    loadMarketplaceItems()
   }
-  
-  function downloadArtwork() {
-    const modalImage = document.getElementById("modal-image")
-    const modalTitle = document.getElementById("modal-title")
-  
-    // Create download link
-    const downloadLink = document.createElement("a")
-    downloadLink.href = modalImage.src
-    downloadLink.download = `${modalTitle.textContent}.png`
-    document.body.appendChild(downloadLink)
-    downloadLink.click()
-    document.body.removeChild(downloadLink)
-  
-    showNotification("Artwork downloaded successfully!")
+
+  // Unified search/filter function for both gallery and marketplace
+  function filterItems(items, searchTerm, category, price, sort, displayCallback, context) {
+    searchTerm = searchTerm ? searchTerm.toLowerCase() : ""
+
+    // Filter by search term
+    let filteredItems = items.filter((item) => !searchTerm || item.name.toLowerCase().includes(searchTerm))
+
+    // Filter by category (marketplace only)
+    if (category && category !== "all") {
+      filteredItems = filteredItems.filter((item) => item.category === category)
+    }
+
+    // Filter by price (marketplace only)
+    if (context === "marketplace" && price && price !== "all") {
+      filteredItems = filteredItems.filter((item) => {
+        const priceValue = item.price
+        switch (price) {
+          case "under-50":
+            return priceValue < 50
+          case "50-100":
+            return priceValue >= 50 && priceValue <= 100
+          case "100-200":
+            return priceValue > 100 && priceValue <= 200
+          case "over-200":
+            return priceValue > 200
+          default:
+            return true
+        }
+      })
+    }
+
+    // Sort items
+    if (sort) {
+      switch (sort) {
+        case "newest":
+          filteredItems.sort((a, b) => new Date(b.date) - new Date(a.date))
+          break
+        case "oldest":
+          filteredItems.sort((a, b) => new Date(a.date) - new Date(b.date))
+          break
+        case "name":
+          filteredItems.sort((a, b) => a.name.localeCompare(b.name))
+          break
+        case "price-low":
+          filteredItems.sort((a, b) => a.price - b.price)
+          break
+        case "price-high":
+          filteredItems.sort((a, b) => b.price - a.price)
+          break
+        case "popular":
+          // This would normally use a popularity metric
+          // For now, just randomize
+          filteredItems.sort(() => Math.random() - 0.5)
+          break
+      }
+    }
+
+    // Display the filtered items
+    displayCallback(filteredItems)
   }
-  
-  function deleteArtwork() {
-    const modal = document.getElementById("artwork-modal")
-    const artworkId = modal.dataset.artworkId
-  
-    // Get saved artwork
-    let savedArtwork = JSON.parse(localStorage.getItem("artwork")) || []
-  
-    // Filter out the artwork to delete
-    savedArtwork = savedArtwork.filter((artwork) => artwork.id !== artworkId)
-  
-    // Update localStorage
-    localStorage.setItem("artwork", JSON.stringify(savedArtwork))
-  
-    // Close modal
-    closeArtworkModal()
-  
-    // Reload gallery
-    loadGallery()
-  
-    showNotification("Artwork deleted successfully!")
-  }
-  
-  // Notification system
-  function setupNotifications() {
-    // Nothing to set up initially
-  }
-  
-  function showNotification(message) {
-    const notification = document.getElementById("notification")
-    const notificationMessage = document.getElementById("notification-message")
-  
-    // Set message
-    notificationMessage.textContent = message
-  
-    // Show notification
-    notification.classList.add("show")
-  
-    // Hide after 3 seconds
-    setTimeout(() => {
-      notification.classList.remove("show")
-    }, 3000)
-  }
-  
-  
+})
+
