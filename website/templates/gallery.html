@@ -4,22 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gallery - ArtCanvas</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
 </head>
-<body>
+<body class="draw-body">
     <nav class="navbar">
-        <div class="logo">
-            <i class="fas fa-paint-brush"></i>
-            <span>ArtCanvas</span>
+        <div class="container navbar-container">
+            <div class="logo">
+                <i class="fas fa-palette"></i>
+                <span>ArtCanvas</span>
+            </div>
+            <div class="nav-links">
+                <a href="{{ url_for('index') }}">Marketplace</a>
+                <a href="{{ url_for('draw') }}" >Draw</a>
+                <a href="{{ url_for('gallery') }}" class="active">Gallery</a>
+            </div>
         </div>
-        <ul class="nav-links">
-            <li><a href="index.html">Marketplace</a></li>
-            <li><a href="draw.html">Draw</a></li>
-            <li class="active"><a href="gallery.html">Gallery</a></li>
-        </ul>
     </nav>
+
 
     <main>
         <div class="container">
@@ -30,8 +34,9 @@
             
             <div class="gallery-controls">
                 <div class="search-box">
+                    <label for="sortBy">Search:</label>
                     <input type="text" id="searchArtwork" placeholder="Search by name...">
-                    <i class="fas fa-search"></i>
+                    <i class="fas fa-search" style="margin-top: 0.7rem;"></i>
                 </div>
                 <div class="sort-options">
                     <label for="sortBy">Sort by:</label>
@@ -50,24 +55,15 @@
                 <div class="empty-gallery">
                     <i class="fas fa-image"></i>
                     <p>Your gallery is empty. Start creating some artwork!</p>
-                    <a href="index.html" class="primary-btn">Create Artwork</a>
+                    <a href="{{ url_for('draw') }}" class="btn primary-btn">Create Artwork</a>
                 </div>
             </div>
-            
-            <div class="cta-section" style="margin-top: 3rem; text-align: center;">
-                <h2>Ready to share your art with the world?</h2>
-                <p>List your artwork on our marketplace and start selling today</p>
-                <a href="index.html" class="btn primary-btn" style="margin-top: 1rem;">
-                    <i class="fas fa-store"></i> Go to Marketplace
-                </a>
-            </div>
-        </div>
     </main>
 
     <div id="artwork-modal" class="modal">
         <div class="modal-content">
             <span class="close-modal">&times;</span>
-            <div class="artwork-details">
+            <div class="artwork-details" style="background-color: #ffffff;">
                 <h2 id="modal-title">Artwork Title</h2>
                 <p id="modal-date">Created on: </p>
                 <p id="modal-category">Category: </p>
@@ -94,7 +90,6 @@
         <p id="notification-message"></p>
     </div>
 
-    <script src="scripts.js"></script>
+    <script src="{{ url_for('static', filename='scripts.js') }}"></script>
 </body>
 </html>
-
