@@ -379,10 +379,10 @@ document.addEventListener("DOMContentLoaded", () => {
   // Marketplace page functionality
   if (document.getElementById("marketplace-grid")) {
     const marketplaceGrid = document.getElementById("marketplace-grid")
-    const searchInput = document.getElementById("searchMarketplace")
-    const categoryFilter = document.getElementById("categoryFilter")
-    const priceFilter = document.getElementById("priceFilter")
-    const sortFilter = document.getElementById("sortFilter")
+    const searchInput = document.getElementById("search-input") // Updated to match HTML
+    const categoryFilter = document.getElementById("category-filter") // Updated to match HTML
+    const priceFilter = document.getElementById("price-filter") // Updated to match HTML
+    const sortFilter = document.getElementById("sort-filter") // Updated to match HTML
 
     // Create marketplace modal elements if they don't exist
     let marketplaceModal = document.getElementById("marketplace-modal")
@@ -402,7 +402,7 @@ document.addEventListener("DOMContentLoaded", () => {
               <img id="marketplace-modal-image" src="/placeholder.svg?height=400&width=600" alt="Artwork">
             </div>
             <div class="modal-actions">
-              <button id="buy-artwork" class="btn primary-btn">
+              <button id="buy-artwork" class="btn btn-primary">
                 <i class="fas fa-shopping-cart"></i> Buy Now
               </button>
             </div>
@@ -429,7 +429,16 @@ document.addEventListener("DOMContentLoaded", () => {
       marketplaceItems = artworks.filter((artwork) => artwork.forSale)
 
       if (marketplaceItems.length === 0) {
-        // If no user artworks are for sale, keep the sample items
+        // If no user artworks are for sale, show empty state
+        marketplaceGrid.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-message">
+              <i class="fas fa-store text-muted-foreground text-4xl mb-4"></i>
+              <p>No artwork available in the marketplace</p>
+              <a href="draw.html" class="btn btn-primary mt-4">Create and sell your art</a>
+            </div>
+          </div>
+        `
         return
       }
 
@@ -440,50 +449,156 @@ document.addEventListener("DOMContentLoaded", () => {
       displayMarketplaceItems(marketplaceItems)
     }
 
-    // Display marketplace items
+    // Display marketplace items - IMPROVED VERSION
     function displayMarketplaceItems(itemsToDisplay) {
       if (itemsToDisplay.length === 0) {
-        marketplaceGrid.innerHTML = "No artwork found"
+        marketplaceGrid.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-message">
+              <i class="fas fa-search text-muted-foreground text-4xl mb-4"></i>
+              <p>No artwork found matching your criteria</p>
+            </div>
+          </div>
+        `
         return
       }
 
       marketplaceGrid.innerHTML = ""
 
+      // Add CSS for the improved card design if it doesn't exist
+      if (!document.getElementById("marketplace-card-styles")) {
+        const styleEl = document.createElement("style")
+        styleEl.id = "marketplace-card-styles"
+        styleEl.textContent = `
+          .artwork-card {
+            border-radius: var(--radius);
+            overflow: hidden;
+            background-color: var(--card);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+          }
+          
+          .artwork-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+          }
+          
+          .artwork-image-container {
+            position: relative;
+            padding-top: 75%; /* 4:3 aspect ratio */
+            overflow: hidden;
+          }
+          
+          .artwork-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s;
+          }
+          
+          .artwork-card:hover .artwork-image {
+            transform: scale(1.05);
+          }
+          
+          .artwork-info {
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+          }
+          
+          .artwork-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+          
+          .artwork-category {
+            font-size: 0.75rem;
+            color: var(--muted-foreground);
+            margin-bottom: 0.5rem;
+          }
+          
+          .artwork-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: auto;
+          }
+          
+          .artwork-price {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--primary);
+          }
+          
+          .artwork-artist {
+            font-size: 0.75rem;
+            color: var(--muted-foreground);
+          }
+          
+          .artwork-actions {
+            padding: 0 1rem 1rem;
+          }
+          
+          .artwork-actions .btn {
+            width: 100%;
+            font-size: 0.875rem;
+          }
+        `
+        document.head.appendChild(styleEl)
+      }
+
       itemsToDisplay.forEach((artwork) => {
-        const productCard = document.createElement("div")
-        productCard.className = "product-card"
-        productCard.dataset.id = artwork.id
+        const artworkCard = document.createElement("div")
+        artworkCard.className = "artwork-card"
+        artworkCard.dataset.id = artwork.id
 
         const formattedDate = new Date(artwork.date).toLocaleDateString()
         const categoryDisplay = artwork.category
           ? artwork.category.charAt(0).toUpperCase() + artwork.category.slice(1)
           : "Uncategorized"
 
-        productCard.innerHTML = `
-          <img src="${artwork.dataURL}" alt="${artwork.name}" class="product-image">
-          <div class="product-info">
-            <h3>${artwork.name}</h3>
-            <p>Category: ${categoryDisplay}</p>
-            <div class="artist-info">
-              <span class="artist-name">by You</span>
+        artworkCard.innerHTML = `
+          <div class="artwork-image-container">
+            <img src="${artwork.dataURL}" alt="${artwork.name}" class="artwork-image">
+          </div>
+          <div class="artwork-info">
+            <h3 class="artwork-title">${artwork.name}</h3>
+            <div class="artwork-category">${categoryDisplay}</div>
+            <div class="artwork-meta">
+              <div class="artwork-price">$${artwork.price.toFixed(2)}</div>
+              <div class="artwork-artist">by You</div>
             </div>
-            <div class="price">$${artwork.price.toFixed(2)}</div>
-            <div class="product-actions">
-              <button class="btn primary-btn"><i class="fas fa-shopping-cart"></i> Buy Now</button>
-            </div>
+          </div>
+          <div class="artwork-actions">
+            <button class="btn btn-primary">
+              <i class="fas fa-shopping-cart"></i> Buy Now
+            </button>
           </div>
         `
 
-        // Add click event to the product card
-        productCard.addEventListener("click", (e) => {
+        // Add click event to the artwork card
+        artworkCard.addEventListener("click", (e) => {
           // Don't open modal if Buy Now button was clicked
-          if (e.target.closest(".primary-btn")) {
+          if (e.target.closest(".btn")) {
+            showNotification("Purchase functionality will be implemented with your Python backend")
             return
           }
           openMarketplaceModal(artwork)
         })
 
-        marketplaceGrid.appendChild(productCard)
+        marketplaceGrid.appendChild(artworkCard)
       })
     }
 
@@ -525,93 +640,63 @@ document.addEventListener("DOMContentLoaded", () => {
       marketplaceModal.style.display = "none"
     })
 
-    // Search functionality - using direct filtering for all criteria
+    // Search functionality - using unified filter function
     if (searchInput) {
       searchInput.addEventListener("input", () => {
-        const searchTerm = searchInput.value.toLowerCase()
-
-        // Filter the marketplace items
-        let filteredItems = marketplaceItems
-
-        // Apply search filter
-        if (searchTerm) {
-          filteredItems = filteredItems.filter((item) => item.name.toLowerCase().includes(searchTerm))
-        }
-
-        // Apply category filter
-        if (categoryFilter && categoryFilter.value !== "all") {
-          filteredItems = filteredItems.filter((item) => item.category === categoryFilter.value)
-        }
-
-        // Apply price filter
-        if (priceFilter && priceFilter.value !== "all") {
-          filteredItems = filteredItems.filter((item) => {
-            const priceValue = item.price
-            switch (priceFilter.value) {
-              case "under-50":
-                return priceValue < 50
-              case "50-100":
-                return priceValue >= 50 && priceValue <= 100
-              case "100-200":
-                return priceValue > 100 && priceValue <= 200
-              case "over-200":
-                return priceValue > 200
-              default:
-                return true
-            }
-          })
-        }
-
-        // Apply sorting
-        if (sortFilter && sortFilter.value !== "newest") {
-          switch (sortFilter.value) {
-            case "price-low":
-              filteredItems.sort((a, b) => a.price - b.price)
-              break
-            case "price-high":
-              filteredItems.sort((a, b) => b.price - a.price)
-              break
-            case "popular":
-              // This would normally use a popularity metric
-              // For now, just randomize
-              filteredItems.sort(() => Math.random() - 0.5)
-              break
-          }
-        }
-
-        // Display the filtered items
-        displayMarketplaceItems(filteredItems)
+        filterItems(
+          marketplaceItems,
+          searchInput.value,
+          categoryFilter ? categoryFilter.value : null,
+          priceFilter ? priceFilter.value : null,
+          sortFilter ? sortFilter.value : "newest",
+          displayMarketplaceItems,
+          "marketplace",
+        )
       })
     }
 
     // Event listeners for filters
     if (categoryFilter) {
       categoryFilter.addEventListener("change", () => {
-        // Trigger the search input's event handler
-        searchInput.dispatchEvent(new Event("input"))
+        filterItems(
+          marketplaceItems,
+          searchInput ? searchInput.value : "",
+          categoryFilter.value,
+          priceFilter ? priceFilter.value : null,
+          sortFilter ? sortFilter.value : "newest",
+          displayMarketplaceItems,
+          "marketplace",
+        )
       })
     }
 
     if (priceFilter) {
       priceFilter.addEventListener("change", () => {
-        // Trigger the search input's event handler
-        searchInput.dispatchEvent(new Event("input"))
+        filterItems(
+          marketplaceItems,
+          searchInput ? searchInput.value : "",
+          categoryFilter ? categoryFilter.value : null,
+          priceFilter.value,
+          sortFilter ? sortFilter.value : "newest",
+          displayMarketplaceItems,
+          "marketplace",
+        )
       })
     }
 
     if (sortFilter) {
       sortFilter.addEventListener("change", () => {
-        // Trigger the search input's event handler
-        searchInput.dispatchEvent(new Event("input"))
+        filterItems(
+          marketplaceItems,
+          searchInput ? searchInput.value : "",
+          categoryFilter ? categoryFilter.value : null,
+          priceFilter ? priceFilter.value : null,
+          sortFilter.value,
+          displayMarketplaceItems,
+          "marketplace",
+        )
       })
     }
-
-    // Buy now button functionality
-    marketplaceGrid.addEventListener("click", (e) => {
-      if (e.target.closest(".primary-btn") && e.target.textContent.includes("Buy Now")) {
-        showNotification("Purchase functionality will be implemented with your Python backend")
-      }
-    })
 
     // Load marketplace items
     loadMarketplaceItems()
