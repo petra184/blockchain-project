@@ -27,3 +27,29 @@ class Block(object):
         self.miner = miner
         self.transactions = transactions or []
         self.size = size
+
+class BlockChain:
+    def __init__(self, genesis_block):
+        self.chain = [genesis_block]
+        self.block_map = {genesis_block.id: genesis_block}  # Optional: quick lookup
+
+    def addBlock(self, block):
+        # Ensure correct parent linkage before adding
+        if self.chain and block.parentlink != self.chain[-1].id:
+            raise ValueError("Block parentlink does not match last block in chain.")
+        self.chain.append(block)
+        self.block_map[block.id] = block
+
+    def getLast(self):
+        return self.chain[-1] if self.chain else None
+
+    def removeLast(self):
+        if self.chain:
+            removed_block = self.chain.pop()
+            self.block_map.pop(removed_block.id, None)
+
+    def __len__(self):
+        return len(self.chain)
+
+    def __repr__(self):
+        return f"<BlockChain length={len(self.chain)} last={self.getLast().id if self.chain else 'None'}>"

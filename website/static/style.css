@@ -66,7 +66,7 @@ body {
 }
 
 .draw-body {
-  background-color: var(--primary-light);
+  background: linear-gradient(to bottom,var(--primary-light), #ffffff, var(--primary-light), #ffffff);
 }
 
 main {
@@ -611,8 +611,9 @@ main {
 
 .modal-image-container {
   margin: 1.5rem 0;
-  border-radius: var(--radius);
+  border-radius: 0.75rem;
   overflow: hidden;
+  box-shadow: 0 1px 3px rgba(23, 16, 16, 0.221);
 }
 
 .modal-image-container img {
@@ -622,11 +623,9 @@ main {
 }
 
 .modal-actions {
-  display: flex;
-  flex-wrap: wrap;
   gap: 0.75rem;
-  justify-content: flex-end;
   margin-top: 1.5rem;
+  justify-content: center;
 }
 
 /* Empty state */
@@ -786,7 +785,7 @@ main {
   display: grid;
   grid-template-columns: 1fr auto;
   gap: 1.5rem;
-  align-items: end;
+  align-items: center;
 }
 
 @media (max-width: 768px) {
@@ -804,7 +803,7 @@ main {
 .artwork-details {
   display: flex;
   gap: 20px;
-  justify-content: center;
+  justify-content: left;
   align-items: flex-end; /* aligns input fields nicely at the bottom */
   flex-wrap: wrap; /* allows it to stack on smaller screens */
   margin-bottom: 20px;

@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - Secure Art Platform</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --background: linear-gradient(to right, #f1f5f9, #580f56);
+            --foreground: #0f0f10;
+            --card: #ffffff;
+            --card-foreground: #0f0f10;
+            --popover: #ffffff;
+            --popover-foreground: #0f0f10;
+            --primary: #8b5cf6;
+            --primary-foreground: #f8fafc;
+            --primary-light: rgba(139, 92, 246, 0.1);
+            --secondary: #f1f5f9;
+            --secondary-foreground: #1e293b;
+            --muted: #f1f5f9;
+            --muted-foreground: #64748b;
+            --accent: #f1f5f9;
+            --accent-foreground: #1e293b;
+            --destructive: #ef4444;
+            --destructive-foreground: #f8fafc;
+            --border: #e2e8f0;
+            --input: #e2e8f0;
+            --ring: #8b5cf6;
+            --radius: 0.5rem;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Inter", sans-serif;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--foreground);
+            transition: background-color 0.3s, color 0.3s;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .auth-container {
+            width: 100%;
+            max-width: 450px;
+            padding: 2.5rem;
+            background-color: var(--card);
+            border-radius: var(--radius);
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.05);
+            position: relative;
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .auth-header h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--foreground);
+        }
+
+        .auth-header p {
+            color: var(--muted-foreground);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--input);
+            border-radius: var(--radius);
+            background-color: var(--background);
+            color: var(--foreground);
+            font-size: 1rem;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px var(--primary-light);
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: var(--primary-foreground);
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            background-color: #7c3aed;
+        }
+
+        .auth-footer {
+            margin-top: 2rem;
+            text-align: center;
+            color: var(--muted-foreground);
+        }
+
+        .auth-footer a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .auth-footer a:hover {
+            text-decoration: underline;
+        }
+
+        .error-message {
+            color: var(--destructive);
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+
+        .theme-toggle {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: var(--muted-foreground);
+            cursor: pointer;
+            font-size: 1.25rem;
+        }
+
+        .info-box {
+            background-color: var(--secondary);
+            border-radius: var(--radius);
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .info-box h3 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .info-box p {
+            font-size: 0.875rem;
+            color: var(--secondary-foreground);
+            line-height: 1.5;
+        }
+
+        .key-display {
+            background-color: var(--secondary);
+            border-radius: var(--radius);
+            padding: 1rem;
+            margin-top: 1.5rem;
+            display: none;
+        }
+
+        .key-display h3 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .key-display pre {
+            font-family: monospace;
+            font-size: 0.75rem;
+            background-color: var(--background);
+            padding: 0.75rem;
+            border-radius: calc(var(--radius) - 2px);
+            overflow-x: auto;
+            color: var(--foreground);
+            border: 1px solid var(--border);
+        }
+
+        .key-display .warning {
+            color: var(--destructive);
+            font-size: 0.75rem;
+            margin-top: 0.5rem;
+        }
+
+        .download-btn {
+            background-color: var(--secondary);
+            color: var(--secondary-foreground);
+            font-size: 0.875rem;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius);
+            margin-top: 0.5rem;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            display: inline-block;
+        }
+
+        .download-btn:hover {
+            background-color: var(--muted);
+        }
+
+        .status-message {
+            margin-top: 1rem;
+            padding: 0.75rem;
+            border-radius: var(--radius);
+            font-size: 0.875rem;
+            display: none;
+        }
+
+        .status-success {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+        }
+
+        .status-error {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--destructive);
+        }
+
+        .loading {
+            display: inline-block;
+            width: 1rem;
+            height: 1rem;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 0.5rem;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body style="background: linear-gradient(to right, #f1f5f9, var(--primary));">
+    <div class="container">
+        <div class="auth-container">
+            
+            <div class="auth-header">
+                <h1>Create Secure Account</h1>
+                <p>Generate your cryptographic identity</p>
+            </div>
+            
+            <div class="info-box">
+                <h3>Secure Authentication</h3>
+                <p>This platform uses cryptographic key pairs for authentication. When you sign up, we'll generate a private key (kept only by you) and a public key (stored on our network). Your private key is your secure digital identity - keep it safe.</p>
+            </div>
+            
+            <form id="signup-form">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" required>
+                    <div class="error-message" id="username-error"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" required>
+                    <div class="error-message" id="email-error"></div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary" id="generate-btn">Generate Key Pair</button>
+            </form>
+            
+            <div class="key-display" id="key-display">
+                <h3>Your Private Key</h3>
+                <pre id="private-key"></pre>
+                <p class="warning">IMPORTANT: Save this private key securely. It will not be stored on our servers and cannot be recovered if lost.</p>
+                <button class="download-btn" id="download-key">Download Private Key</button>
+                
+                <div class="status-message" id="status-message"></div>
+            </div>
+            
+            <div class="auth-footer">
+                <p>Already have an account? <a href="login.html">Log In</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('theme-toggle');
+        const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+        
+        // Check for saved theme preference or use the system preference
+        const currentTheme = localStorage.getItem('theme') || 
+                            (prefersDarkScheme.matches ? 'dark' : 'light');
+        
+        // Set initial theme
+        if (currentTheme === 'dark') {
+            document.body.classList.add('dark');
+            themeToggle.textContent = '☀️';
+        } else {
+            themeToggle.textContent = '🌙';
+        }
+        
+        // Toggle theme when button is clicked
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark');
+            
+            // Update button text and save preference
+            if (document.body.classList.contains('dark')) {
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+            }
+        });
+        
+        // Cryptographic key generation
+        const signupForm = document.getElementById('signup-form');
+        const usernameInput = document.getElementById('username');
+        const emailInput = document.getElementById('email');
+        const generateBtn = document.getElementById('generate-btn');
+        const keyDisplay = document.getElementById('key-display');
+        const privateKeyDisplay = document.getElementById('private-key');
+        const downloadKeyBtn = document.getElementById('download-key');
+        const statusMessage = document.getElementById('status-message');
+        
+        const usernameError = document.getElementById('username-error');
+        const emailError = document.getElementById('email-error');
+        
+        // Function to generate key pair
+        async function generateKeyPair() {
+            try {
+                // Generate RSA key pair
+                const keyPair = await window.crypto.subtle.generateKey(
+                    {
+                        name: "RSASSA-PKCS1-v1_5",
+                        modulusLength: 2048,
+                        publicExponent: new Uint8Array([1, 0, 1]),
+                        hash: "SHA-256",
+                    },
+                    true, // extractable
+                    ["sign", "verify"] // key usages
+                );
+                
+                // Export the private key to PKCS#8 format
+                const privateKeyExported = await window.crypto.subtle.exportKey(
+                    "pkcs8",
+                    keyPair.privateKey
+                );
+                
+                // Export the public key to SPKI format
+                const publicKeyExported = await window.crypto.subtle.exportKey(
+                    "spki",
+                    keyPair.publicKey
+                );
+                
+                // Convert the exported keys to base64
+                const privateKeyBase64 = arrayBufferToBase64(privateKeyExported);
+                const publicKeyBase64 = arrayBufferToBase64(publicKeyExported);
+                
+                return {
+                    privateKey: privateKeyBase64,
+                    publicKey: publicKeyBase64
+                };
+            } catch (error) {
+                console.error("Error generating key pair:", error);
+                throw error;
+            }
+        }
+        
+        // Helper function to convert ArrayBuffer to Base64
+        function arrayBufferToBase64(buffer) {
+            const bytes = new Uint8Array(buffer);
+            let binary = '';
+            for (let i = 0; i < bytes.byteLength; i++) {
+                binary += String.fromCharCode(bytes[i]);
+            }
+            return window.btoa(binary);
+        }
+        
+        // Handle form submission
+        signupForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            let isValid = true;
+            
+            // Reset error messages
+            usernameError.style.display = 'none';
+            emailError.style.display = 'none';
+            
+            // Validate username
+            if (usernameInput.value.trim() === '') {
+                usernameError.textContent = 'Username is required';
+                usernameError.style.display = 'block';
+                isValid = false;
+            }
+            
+            // Validate email
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(emailInput.value)) {
+                emailError.textContent = 'Please enter a valid email address';
+                emailError.style.display = 'block';
+                isValid = false;
+            }
+            
+            if (!isValid) {
+                return;
+            }
+            
+            // Show loading state
+            generateBtn.innerHTML = '<span class="loading"></span> Generating...';
+            generateBtn.disabled = true;
+            
+            try {
+                // Generate key pair
+                const keys = await generateKeyPair();
+                
+                // Display the private key
+                privateKeyDisplay.textContent = keys.privateKey;
+                keyDisplay.style.display = 'block';
+                
+                // Send the public key to the server
+                const response = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: usernameInput.value,
+                        email: emailInput.value,
+                        publicKey: keys.publicKey
+                    })
+                });
+                
+                if (response.ok) {
+                    statusMessage.textContent = 'Account created successfully! Save your private key to log in.';
+                    statusMessage.className = 'status-message status-success';
+                    statusMessage.style.display = 'block';
+                } else {
+                    const errorData = await response.json();
+                    statusMessage.textContent = errorData.message || 'Failed to create account. Please try again.';
+                    statusMessage.className = 'status-message status-error';
+                    statusMessage.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                statusMessage.textContent = 'An error occurred while generating keys. Please try again.';
+                statusMessage.className = 'status-message status-error';
+                statusMessage.style.display = 'block';
+            } finally {
+                generateBtn.innerHTML = 'Generate Key Pair';
+                generateBtn.disabled = false;
+            }
+        });
+        
+        // Download private key
+        downloadKeyBtn.addEventListener('click', () => {
+            const privateKey = privateKeyDisplay.textContent;
+            const blob = new Blob([privateKey], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `private_key_${usernameInput.value}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+    </script>
+</body>
+</html>

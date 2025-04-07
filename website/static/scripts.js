@@ -529,6 +529,16 @@ document.addEventListener("DOMContentLoaded", () => {
             margin-bottom: 0.5rem;
           }
           
+          .artwork-description {
+            font-size: 0.85rem;
+            color: var(--muted-foreground);
+            margin-bottom: 0.75rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+          }
+          
           .artwork-meta {
             display: flex;
             justify-content: space-between;
@@ -555,20 +565,29 @@ document.addEventListener("DOMContentLoaded", () => {
             width: 100%;
             font-size: 0.875rem;
           }
+      
+          /* Modal image styles */
+          .modal-image-container img {
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          }
         `
         document.head.appendChild(styleEl)
       }
-
+      
       itemsToDisplay.forEach((artwork) => {
         const artworkCard = document.createElement("div")
         artworkCard.className = "artwork-card"
         artworkCard.dataset.id = artwork.id
-
+      
         const formattedDate = new Date(artwork.date).toLocaleDateString()
         const categoryDisplay = artwork.category
           ? artwork.category.charAt(0).toUpperCase() + artwork.category.slice(1)
           : "Uncategorized"
-
+        
+        // Create a description from the category if no description exists
+        const description = artwork.description || `A beautiful piece of ${categoryDisplay.toLowerCase()} art.`
+      
         artworkCard.innerHTML = `
           <div class="artwork-image-container">
             <img src="${artwork.dataURL}" alt="${artwork.name}" class="artwork-image">
@@ -576,6 +595,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <div class="artwork-info">
             <h3 class="artwork-title">${artwork.name}</h3>
             <div class="artwork-category">${categoryDisplay}</div>
+            <div class="artwork-description">${description}</div>
             <div class="artwork-meta">
               <div class="artwork-price">$${artwork.price.toFixed(2)}</div>
               <div class="artwork-artist">by You</div>
@@ -587,7 +607,7 @@ document.addEventListener("DOMContentLoaded", () => {
             </button>
           </div>
         `
-
+      
         // Add click event to the artwork card
         artworkCard.addEventListener("click", (e) => {
           // Don't open modal if Buy Now button was clicked
@@ -597,7 +617,7 @@ document.addEventListener("DOMContentLoaded", () => {
           }
           openMarketplaceModal(artwork)
         })
-
+      
         marketplaceGrid.appendChild(artworkCard)
       })
     }
@@ -605,22 +625,32 @@ document.addEventListener("DOMContentLoaded", () => {
     // Open marketplace modal
     function openMarketplaceModal(artwork) {
       currentMarketplaceItemId = artwork.id
+      
+      // Update title
+      const marketplaceModalTitle = document.getElementById("marketplace-modal-title")
       marketplaceModalTitle.textContent = artwork.name
-
+    
       // Display category
       const categoryDisplay = artwork.category
         ? artwork.category.charAt(0).toUpperCase() + artwork.category.slice(1)
         : "Uncategorized"
-      marketplaceModalCategory.textContent = `Category: ${categoryDisplay}`
-
+      const marketplaceModalCategory = document.getElementById("marketplace-modal-category")
+      marketplaceModalCategory.textContent = categoryDisplay
+    
       // Display price
-      marketplaceModalPrice.textContent = `Price: $${artwork.price.toFixed(2)}`
-
+      const marketplaceModalPrice = document.getElementById("marketplace-modal-price")
+      marketplaceModalPrice.textContent = `$${artwork.price.toFixed(2)}`
+    
       // Set image
+      const marketplaceModalImage = document.getElementById("marketplace-modal-image")
       marketplaceModalImage.src = artwork.dataURL
-
+    
       // Show modal
+      const marketplaceModal = document.getElementById("marketplace-modal")
       marketplaceModal.style.display = "block"
+      
+      // Add body class to prevent scrolling
+      document.body.classList.add('modal-open')
     }
 
     // Close marketplace modal
